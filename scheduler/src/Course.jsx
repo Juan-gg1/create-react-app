@@ -1,20 +1,22 @@
 import React from "react";
 
-export const getCourseTerm = (course) => course?.term;
-
-export const getCourseNumber = (course) => course?.number;
-
-const Course = ({ course }) => {
-  if (!course) return null;
+const Course = ({ course, selected, conflict, toggleSelected }) => {
+  const className = `
+    card m-1 p-2
+    ${selected ? 'selected' : ''}
+    ${conflict ? 'conflict' : ''}
+  `;
 
   return (
-    <div className="card m-1 p-2">
+    <div className={className} onClick={toggleSelected}>
       <div className="card-body">
         <div className="card-title fw-bold">
-          {getCourseTerm(course)} CS {getCourseNumber(course)}
+          {course.term} CS {course.number}
         </div>
 
-        <div className="card-text">{course.title}</div>
+        <div className="card-text">
+          {course.title}
+        </div>
 
         <div className="text-muted small mt-2">
           {course.meets}
