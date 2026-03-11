@@ -1,6 +1,6 @@
 import React from 'react';
 import Banner from './Banner';
-import CourseList from './CourseList';
+import CourseList from './components/CourseList';
 import './App.css';
 
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';

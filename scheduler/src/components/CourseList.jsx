@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Course from "./Course";
+import { hasConflict } from "../utilities/times";
 
 const terms = { F: 'Fall', W: 'Winter', S: 'Spring' };
 
@@ -39,20 +40,6 @@ const CourseList = ({ courses }) => {
   const termCourses = Object.values(courses)
     .filter(course => term === course.term);
 
-  // CONFLICT LOGIC
-
-  const daysOverlap = (days1, days2) =>
-    days1?.split('').some(day => days2?.includes(day));
-
-  const hoursOverlap = (hours1, hours2) =>
-    hours1 && hours2 &&
-    Math.max(hours1.start, hours2.start) <
-    Math.min(hours1.end, hours2.end);
-
-  const timeConflict = (course1, course2) =>
-    daysOverlap(course1.days, course2.days) &&
-    hoursOverlap(course1.hours, course2.hours);
-
   const toggleSelected = (course) => {
     if (selected.includes(course)) {
       setSelected(selected.filter(x => x !== course));
@@ -60,12 +47,6 @@ const CourseList = ({ courses }) => {
       setSelected([...selected, course]);
     }
   };
-
-  const hasConflict = (course) =>
-    selected.some(selectedCourse =>
-      selectedCourse !== course &&
-      timeConflict(course, selectedCourse)
-    );
 
   return (
     <>
@@ -77,7 +58,7 @@ const CourseList = ({ courses }) => {
             key={`${course.term}${course.number}`}
             course={course}
             selected={selected.includes(course)}
-            conflict={hasConflict(course)}
+            conflict={hasConflict(course, selected)}
             toggleSelected={() => toggleSelected(course)}
           />
         ))}
