@@ -1,17 +1,30 @@
-import React, { useState } from "react";
-import Course from "./Course";
-import { hasConflict } from "../utilities/times";
+import { useState } from 'react';
+import { Course } from './Course.jsx';
+import { signInWithGoogle, signOut, useUserState } from '../utilities/firebase.jsx';
+import { timeParts } from '../utilities/times.jsx';
 
-const terms = { F: 'Fall', W: 'Winter', S: 'Spring' };
+export const terms = { F:'Fall', W:'Winter', S:'Spring' };
 
-const TermButton = ({ term, setTerm, checked }) => (
+const SignInButton = () => (
+  <button className="btn btn-secondary btn-sm" onClick={() => signInWithGoogle()}>
+    Sign In
+  </button>
+);
+
+const SignOutButton = () => (
+  <button className="btn btn-secondary btn-sm" onClick={() => signOut()}>
+    Sign Out
+  </button>
+);
+
+export const TermButton = ({term, setTerm, checked}) => (
   <>
     <input
       type="radio"
       id={term}
       className="btn-check"
-      autoComplete="off"
       checked={checked}
+      autoComplete="off"
       onChange={() => setTerm(term)}
     />
     <label className="btn btn-success m-1 p-2" htmlFor={term}>
@@ -20,49 +33,52 @@ const TermButton = ({ term, setTerm, checked }) => (
   </>
 );
 
-const TermSelector = ({ term, setTerm }) => (
-  <div className="btn-group mb-3">
-    {Object.values(terms).map(value => (
-      <TermButton
-        key={value}
-        term={value}
-        setTerm={setTerm}
-        checked={value === term}
-      />
-    ))}
-  </div>
-);
+export const TermSelector = ({term, setTerm}) => {
+  const [user] = useUserState();
+  return (
+    <div className="btn-toolbar justify-content-between mb-3">
+      <div className="btn-group">
+        {Object.values(terms).map(value => (
+          <TermButton
+            key={value}
+            term={value}
+            setTerm={setTerm}
+            checked={value === term}
+          />
+        ))}
+      </div>
+      { user ? <SignOutButton /> : <SignInButton /> }
+    </div>
+  );
+};
 
-const CourseList = ({ courses }) => {
+export const CourseList = ({ courses }) => {
   const [term, setTerm] = useState('Fall');
   const [selected, setSelected] = useState([]);
+  const [user] = useUserState();
 
-  const termCourses = Object.values(courses)
+  const termCourses = Object.entries(courses)
+    .map(([id, course]) => ({ id, ...course, ...timeParts(course.meets) }))
     .filter(course => term === course.term);
-
-  const toggleSelected = (course) => {
-    if (selected.includes(course)) {
-      setSelected(selected.filter(x => x !== course));
-    } else {
-      setSelected([...selected, course]);
-    }
-  };
 
   return (
     <>
       <TermSelector term={term} setTerm={setTerm} />
-
       <div className="course-list">
         {termCourses.map(course => (
           <Course
-            key={`${course.term}${course.number}`}
+            key={course.id}
             course={course}
-            selected={selected.includes(course)}
-            conflict={hasConflict(course, selected)}
-            toggleSelected={() => toggleSelected(course)}
+            selected={selected}
+            setSelected={setSelected}
           />
         ))}
       </div>
+      {!user && (
+        <div className="alert alert-info mt-3">
+          You must sign in to select and edit courses
+        </div>
+      )}
     </>
   );
 };

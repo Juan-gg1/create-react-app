@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #0d3d9d;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -48,11 +48,11 @@ button {
 }
 
 .selected {
-  background-color: #d4edda;
+  background-color: #2bd853;
 }
 
 .conflict {
-  background-color: #f8d7da;
+  background-color: #f52133;
   pointer-events: none;
   opacity: 0.6;
 }
